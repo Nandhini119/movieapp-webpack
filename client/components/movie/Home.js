@@ -16,7 +16,9 @@ injectTapEventPlugin();
 const style = {
                 appbarstyle: {
                                 textAlign: 'center', 
-                                backgroundColor: teal500 
+                                backgroundColor: teal500,
+                                position : 'fixed',
+                                top : "0"
                             },    
                 raisedstyle: {
                                 margin: '12'  
@@ -35,8 +37,8 @@ class Home extends React.Component {
     constructor() {
         super();   
         this.state = {
-            open: false,
-            drawer: false, 
+            dialogopen: false,
+            open: false, 
             moviename: "",   
             title: "",      
             poster: "",     
@@ -45,6 +47,7 @@ class Home extends React.Component {
             suggestion: [],  
             display: false,   
             displayData: '',  
+            home : false
             };          
             this.handleToggle = this.handleToggle.bind(this); 
             this.handleOpen = this.handleOpen.bind(this); 
@@ -56,19 +59,19 @@ class Home extends React.Component {
     /*opens dialog box and ask for movie name*/   
     handleOpen()
     {
-        this.setState({open: true});  
-        this.setState({drawer: false});  
+        this.setState({dialogopen: true});  
+        this.setState({open:!this.state.open});  
     };   
     /*opens slider menu*/   
     handleToggle() 
     {
-        this.setState({drawer: !this.state.drawer});  
+        this.setState({open: !this.state.open});  
     }         
     /*close dialog box and slider*/  
     handleClose() 
     {
-        this.setState({drawer: false});  
         this.setState({open: false});  
+        this.setState({dialogopen: false});  
     }
     /* adds the movie data to database which carries data to controller*/
     addMovieToFavouriteList(movie) 
@@ -84,7 +87,7 @@ class Home extends React.Component {
                     email: localStorage.getItem("email") 
                  },
             success: function(response) {
-                if (response == 200) {
+                if (response == "OK") {
                     alert("movie already in favourite list");    
                     } else {
                         alert("successfully added to favourite list");   
@@ -99,7 +102,7 @@ class Home extends React.Component {
       controller to display movie list of that particular user*/
     displayFavouriteList() 
     {
-            this.setState({drawer: false}); 
+            this.setState({open: false}); 
             var moviedatas = '';
             /*assigning this of the class to a temporary variable to be used inside ajax call*/
             var object = this;    
@@ -166,7 +169,7 @@ class Home extends React.Component {
     /*search for movies from tmdb api*/
     getMovieNamefromUser() 
     {
-        this.setState({open: false}); 
+        this.setState({dialogopen: false}); 
         var moviedatas = '';
         /*assigning this of the class to a temporary variable to be used inside ajax call*/
         var object = this;   
@@ -208,6 +211,8 @@ class Home extends React.Component {
              data: {},      
              success: function(response) {
                  obj.setState({logout: true});
+                 obj.setState({home: true});
+                 alert(obj.state.home);
                  alert("logged out successfully");  
                  },            
                  error: function(err) {
@@ -223,14 +228,14 @@ class Home extends React.Component {
                         ];
         return ( 
         < MuiThemeProvider >  
-            < div >          
+            < div style={{ paddingTop: 56 }}>          
                 < AppBar style = {style.appbarstyle} title = "Movie Ground"     
                          onLeftIconButtonTouchTap = {this.handleToggle}
                          iconElementRight = { < FlatButton label = "Logout" 
                          onClick = {this.handlelogout.bind(this)}/>
                          }/ > 
                 < Drawer docked = {false} width = {200} 
-                         open = {this.state.drawer}     
+                         open = {this.state.open}     
                          onRequestChange = {(open) => this.setState({open})} >   
                     < MenuItem onClick = {this.handleOpen} > Search < /MenuItem>
                     < MenuItem onClick = {this.displayFavouriteList} > Display Favourites < /MenuItem> 
@@ -241,7 +246,7 @@ class Home extends React.Component {
                              bodyStyle = {{backgroundColor: teal50}} titleStyle = {{backgroundColor: teal100}} 
                              actionsContainerStyle = {{backgroundColor: teal50}}  
                              title = "Search for a movie" actions = {actions}   
-                             modal = {false} open = {this.state.open} onRequestClose = {this.handleClose} >   
+                             modal = {false} open = {this.state.dialogopen} onRequestClose = {this.handleClose} >   
                         < AutoComplete ref = "name" hintText = "Type moviename"
                                        onUpdateInput = {this.handleChangeSuggest}   
                                        completionThreshold = {0} dataSource = {this.state.suggestion} 
@@ -254,6 +259,8 @@ class Home extends React.Component {
                 {/*to render the data to be listed in the home page itself, assigned the data to a state variable*/}
                 {this.state.displayData} 
                 {this.state.logout ? < Redirect to = '/' > < /Redirect> : " "}
+                {!this.state.home ? <Redirect to = '/home'/> 
+                : <Redirect to = '/'/> }
             < /div >
         < /MuiThemeProvider>
                ); 
