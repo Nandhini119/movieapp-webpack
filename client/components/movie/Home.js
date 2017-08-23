@@ -188,7 +188,7 @@ class Home extends React.Component {
                                 moviedatas = response.results.map(moviedata => {
                                     /*the response is iterated and sent to search.js to be displayed in card*/
                                     return ( < SearchData movie = {moviedata}  
-                                    addMovieToFavouriteList = {object.addMovieToFavouriteList.bind(object)}/> 
+                                                    addMovieToFavouriteList = {object.addMovieToFavouriteList.bind(object)}/> 
                                     );          
                             });                 
                             object.setState({displayData: moviedatas});  
@@ -204,14 +204,15 @@ class Home extends React.Component {
     handlelogout() 
     {
         /*assigning this of the class to a temporary variable to be used inside ajax call*/
-         let obj = this;       
+         let obj = this;  
+         this.setState({home: true});
          $.ajax({
              url: Route.logout,
              type: 'GET',   
              data: {},      
              success: function(response) {
                  obj.setState({logout: true});
-                 obj.setState({home: true});
+                 
                  alert(obj.state.home);
                  alert("logged out successfully");  
                  },            
@@ -259,8 +260,7 @@ class Home extends React.Component {
                 {/*to render the data to be listed in the home page itself, assigned the data to a state variable*/}
                 {this.state.displayData} 
                 {this.state.logout ? < Redirect to = '/' > < /Redirect> : " "}
-                {!this.state.home ? <Redirect to = '/home'/> 
-                : <Redirect to = '/'/> }
+               
             < /div >
         < /MuiThemeProvider>
                ); 
